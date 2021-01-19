@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>弹跳的小球</title>
+</head>
+
+<body>
+  <canvas id="mycanvas"></canvas>
+</body>
+<script>
+
+  let mycanvas = document.querySelector("#mycanvas")
+
+  mycanvas.width = window.innerWidth;
+  mycanvas.height = window.innerHeight;
+
+  // 鼠标原先的位置
+  let mose = {
+    x = mycanvas.width / 2,
+    y = mycanvas.height / 2
+  }
+
+  // 鼠标移动获得鼠标位置
+  window.addEventListener("mousemove", function (e) {
+    mose.x = e.clientX;
+    mose.y = e.clientY;
+  })
+
+  // 窗口改变同时改变canvas的宽高
+  window.addEventListener("resize", function () {
+    mycanvas.width = window.innerWidth;
+    mycanvas.height = window.innerHeight;
+
+  })
+  let ctx = mycanvas.getContext("2d")
+
+  let colorArr = ["#3B9A9C", "#53A668", "#F2D43D", "#F29422", "#F20505", "#FF00E2"]
+
+  // 定义球类构造函数 dx dy 水平垂直偏移量 color 颜色
+  function Ball(x, y, dx, dy, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.radius = radius;
+    this.color = color;
+    //绘画圆
+    this.draw = function () {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.closePath();
+    }
+    // 更新动画
+    this.update = function () {
+      // 判断位移
+      if (this.x + this.radius > mycanvas.width || this.x - this.radius < 0) {
+        this.dx = -this.dx
+      }
+      if (this.y + this.radius > mycanvas.height || this.y - this.radius < 0) {
+        this.dy = -this.dy
+      }
+      this.x += this.dx;
+      this.y += this.dy;
+
+      // 判断鼠标经过
+      this.draw()
+    }
+  }
+
+  // 色彩颜色数组
+
+  // 各种小球实例
+  let ballArray;
+
+  // 初始化各种圆
+  function init() {
+    ballArray = [];
+    for (let i = 0; i < 100; i++) {
+      let radius = Math.random() * 5;
+      let x = Math.random() * (mycanvas.width - 2 * radius) + radius;
+      let y = Math.random() * (mycanvas.height - 2 * radius) + radius;
+      let dx = Math.random() * 3;
+      let dy = Math.random() * 3;
+      let color = colorArr[Math.floor(Math.random() * 5)]
+      ballArray.push(new Ball(x, y, dx, dy, radius, color))
+    }
+  }
+  // 动画
+  function animate() {
+    requestAnimationFrame(animate)
+    ctx.clearRect(0, 0, mycanvas.width, mycanvas.height);
+    for (let b of ballArray) {
+      b.update()
+    }
+  }
+  init()
+  animate()
+</script>
+
+</html>
